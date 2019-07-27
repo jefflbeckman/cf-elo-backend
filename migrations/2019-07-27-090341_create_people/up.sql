@@ -1,4 +1,3 @@
--- Your SQL goes here
 CREATE TABLE people(
   id SERIAL PRIMARY KEY,
   first_name VARCHAR NOT NULL,
@@ -6,4 +5,5 @@ CREATE TABLE people(
   age INT NOT NULL,
   profession VARCHAR NOT NULL,
   salary INT NOT NULL
-)
+);
+

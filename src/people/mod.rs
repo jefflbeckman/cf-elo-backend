@@ -2,7 +2,6 @@
 use super::schema::people;
 
 pub mod handler;
-pub mod router;
 pub mod repository;
 
 #[derive(Queryable, AsChangeset, Serialize, Deserialize)]
