@@ -1,7 +1,7 @@
 [package]
-name = "rust-web-with-rocket"
+name = "cf-elo-backend"
 version = "0.1.0"
-authors = ["Dan Newton <danknewton@hotmail.com>"]
+authors = ["Jeffrey Beckman <jefflbeckman@gmail.com>"]
 
 [dependencies]
 rocket = "0.4.0"
