@@ -1,7 +1,0 @@
-CREATE TABLE players (
-  id SERIAL PRIMARY KEY,
-  steam_id VARCHAR NOT NULL,
-  steam_name VARCHAR NOT NULL,
-  num_games INTEGER NOT NULL,
-  elo INTEGER NOT NULL DEFAULT 1200
-)
