@@ -6,9 +6,9 @@ CREATE TABLE "players" (
 
 CREATE TABLE "games" (
   "id" int PRIMARY KEY,
-  "upload_time" timestamp,
+  "upload_time" timestamp DEFAULT current_timestamp,
   "map_version" varchar,
-  "winner" bool
+  "good_guys_won" bool
 );
 
 CREATE TABLE "races" (
