@@ -10,22 +10,17 @@ extern crate serde_derive;
 
 use dotenv::dotenv;
 
-mod games;
-#mod stats;
-#mod racestats;
+mod routes;
 mod connection;
+mod schema;
+mod dbmodels;
 
 fn main() {
     dotenv().ok();
     rocket::ignite()
         .manage(connection::init_pool())
-        .mount("/",routes![games::handler::post,
-                            //stats::handler::all,
-                            //stats::handler::get,
-                            //stats::handler::post,
-                            //racestats::handler::post,
-                            //racestats::handler::all,
-                            //racestats::handler::get
-                         ])
+        .mount("/",routes![routes::player_get,
+                           routes::player_all,
+                           routes::game_post])
         .launch();
 }

@@ -1,19 +1,18 @@
 table! {
     games (id) {
         id -> Int4,
-        upload_time -> Nullable<Timestamp>,
-        map_version -> Nullable<Varchar>,
-        winner -> Nullable<Bool>,
+        upload_time -> Timestamp,
+        map_version -> Varchar,
+        good_guys_won -> Bool,
     }
 }
 
 table! {
     games_players_link (id) {
         id -> Int4,
-        game_id -> Nullable<Int4>,
-        player_id -> Nullable<Int4>,
-        race_id -> Nullable<Int4>,
-        leaver -> Nullable<Int4>,
+        game_id -> Int4,
+        player_id -> Int4,
+        race_id -> Int4,
     }
 }
 
@@ -28,7 +27,7 @@ table! {
 table! {
     races (id) {
         id -> Int4,
-        desc -> Nullable<Varchar>,
+        desc -> Varchar,
     }
 }
 

@@ -1,27 +1,26 @@
 CREATE TABLE "players" (
-  "id" int PRIMARY KEY,
+  "id" serial PRIMARY KEY,
   "steam_id" varchar UNIQUE NOT NULL,
   "elo" int NOT NULL
 );
 
 CREATE TABLE "games" (
-  "id" int PRIMARY KEY,
-  "upload_time" timestamp DEFAULT current_timestamp,
-  "map_version" varchar,
-  "good_guys_won" bool
+  "id" serial PRIMARY KEY,
+  "upload_time" timestamp NOT NULL,
+  "map_version" varchar NOT NULL,
+  "good_guys_won" bool NOT NULL
 );
 
 CREATE TABLE "races" (
-  "id" int PRIMARY KEY,
-  "desc" varchar
+  "id" serial PRIMARY KEY,
+  "desc" varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE "games_players_link" (
-  "id" int PRIMARY KEY,
-  "game_id" int,
-  "player_id" int,
-  "race_id" int,
-  "leaver" int
+  "id" serial PRIMARY KEY,
+  "game_id" int NOT NULL,
+  "player_id" int NOT NULL,
+  "race_id" int NOT NULL
 );
 
 ALTER TABLE "games_players_link" ADD FOREIGN KEY ("race_id") REFERENCES "races" ("id");
