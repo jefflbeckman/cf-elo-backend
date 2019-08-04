@@ -20,7 +20,8 @@ CREATE TABLE "games_players_link" (
   "id" serial PRIMARY KEY,
   "game_id" int NOT NULL,
   "player_id" int NOT NULL,
-  "race_id" int NOT NULL
+  "race_id" int NOT NULL,
+  "good_guys" bool NOT NULL
 );
 
 ALTER TABLE "games_players_link" ADD FOREIGN KEY ("race_id") REFERENCES "races" ("id");

@@ -8,7 +8,7 @@ use rocket::http::Status;
 use rocket_contrib::json::Json;
 
 extern crate serde_json;
-
+use std::*;
 use crate::schema::*;
 use crate::dbmodels::players::*;
 use crate::dbmodels::links::*;
@@ -17,8 +17,10 @@ use crate::dbmodels::races::*;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GameEndPost {
-    pub steam_ids: Vec<String>,
-    pub races: Vec<String>,
+    pub good_guys: Vec<String>,
+    pub good_guys_races: Vec<String>,
+    pub bad_guys: Vec<String>,
+    pub bad_guys_races: Vec<String>,
     pub good_guys_won: bool
 }
 
@@ -94,30 +96,57 @@ pub fn player_all(connection: DbConn) -> Result<Json<Vec<PlayerRow>>, Status> {
         .map(|x| Json(x))
 
 }
+
 #[post("/game", format = "application/json", data = "<game_data>")]
 pub fn game_post(game_data: Json<GameEndPost>, connection: DbConn) -> Result<Json<GameEndPostResponse>, Status> {
-    println!("{:?}",&game_data);
-    if Json(&game_data).races.len() != Json(&game_data).steam_ids.len() {
+    if Json(&game_data).good_guys_races.len() != Json(&game_data).good_guys.len() {
+        return Err(Status::BadRequest); 
+    }
+    if Json(&game_data).bad_guys_races.len() != Json(&game_data).bad_guys.len() {
         return Err(Status::BadRequest); 
     }
 
     /* Populate the tables with any new values */
-    let steam_ids : Vec<PlayerRow>= Json(&game_data).steam_ids.iter().map(|steam_id| handle_new_player(&steam_id, &connection).unwrap()).collect();
-    let race_ids : Vec<RaceRow> = Json(&game_data).races.iter().map(|desc| handle_new_race(&desc, &connection).unwrap()).collect();
-    if race_ids.len() != steam_ids.len() {
-        println!("Race and steamid length not the same");
-        return Err(Status::BadRequest);
-    }
+    let good_guy_ids : Vec<PlayerRow>= Json(&game_data).good_guys.iter().map(|steam_id| handle_new_player(&steam_id, &connection).unwrap()).collect();
+    let good_guy_race_ids : Vec<RaceRow> = Json(&game_data).good_guys_races.iter().map(|desc| handle_new_race(&desc, &connection).unwrap()).collect();
+    let bad_guy_ids : Vec<PlayerRow>= Json(&game_data).bad_guys.iter().map(|steam_id| handle_new_player(&steam_id, &connection).unwrap()).collect();
+    let bad_guy_race_ids : Vec<RaceRow> = Json(&game_data).bad_guys_races.iter().map(|desc| handle_new_race(&desc, &connection).unwrap()).collect();
     let game_id_row = handle_new_game(Json(&game_data).good_guys_won, &connection).unwrap();
 
-    steam_ids.iter().zip(race_ids.iter()).map(|(steam_id, race)| {
+    /* Link up new rows */
+    for (steam_id, race) in good_guy_ids.iter().zip(good_guy_race_ids.iter()) {
         insert_into(games_players_link::table).values(GamePlayerLinkRowInsert {
             game_id: game_id_row.id,
             player_id: steam_id.id,
-            race_id: race.id
-         }).execute(&*connection)});
-    println!("Added a new game, {}", game_id_row.id);
+            race_id: race.id,
+            good_guys: true
+         }).execute(&*connection).map_err(|_| Status::InternalServerError)?;
+    }
+    for (steam_id, race) in bad_guy_ids.iter().zip(bad_guy_race_ids.iter()) {
+        insert_into(games_players_link::table).values(GamePlayerLinkRowInsert {
+            game_id: game_id_row.id,
+            player_id: steam_id.id,
+            race_id: race.id,
+            good_guys: false
+         }).execute(&*connection).map_err(|_| Status::InternalServerError)?;
+    }
+    /* Return response */
     Ok(Json(GameEndPostResponse {
-        msg: "Hello World".to_string()
+        msg: format!("Added a new game, id = {}", game_id_row.id).to_string()
     }))
 }
+
+#[get("/games")]
+pub fn games_all(connection: DbConn) -> Result<Json<Vec<GameRow>>, Status> {
+    games::table.load(&*connection)
+        .map_err(|_| Status::InternalServerError)
+        .map(|x| Json(x))
+}
+
+#[get("/links")]
+pub fn links_all(connection: DbConn) -> Result<Json<Vec<GamePlayerLinkRow>>, Status> {
+    games_players_link::table.load(&*connection)
+        .map_err(|_| Status::InternalServerError)
+        .map(|x| Json(x))
+}
+

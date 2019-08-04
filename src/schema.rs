@@ -13,6 +13,7 @@ table! {
         game_id -> Int4,
         player_id -> Int4,
         race_id -> Int4,
+        good_guys -> Bool,
     }
 }
 

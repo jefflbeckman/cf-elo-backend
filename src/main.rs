@@ -21,6 +21,8 @@ fn main() {
         .manage(connection::init_pool())
         .mount("/",routes![routes::player_get,
                            routes::player_all,
+                           routes::games_all,
+                           routes::links_all,
                            routes::game_post])
         .launch();
 }

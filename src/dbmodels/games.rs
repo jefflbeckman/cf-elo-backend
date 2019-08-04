@@ -1,7 +1,7 @@
 #![allow(proc_macro_derive_resolution_fallback)]
 use crate::schema::games;
 
-#[derive(Queryable, AsChangeset)]
+#[derive(Queryable, AsChangeset, Serialize, Deserialize)]
 #[table_name="games"]
 pub struct GameRow {
     pub id: i32,
